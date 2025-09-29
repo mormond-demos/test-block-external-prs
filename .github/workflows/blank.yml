@@ -1,0 +1,44 @@
+name: Close External PRs
+
+on:
+  pull_request:
+    types: [opened]
+
+env:
+  ORG_NAME: mormond-demos
+
+jobs:
+  check-author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR author is a member of the org
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const org =  process.env.ORG_NAME;
+            const prAuthor = context.payload.pull_request.user.login;
+
+            try {
+              const membership = await github.rest.orgs.getMembershipForUser({
+                org,
+                username: prAuthor
+              });
+
+              if (membership.data.state !== 'active') {
+                throw new Error('Not an active member');
+              }
+            } catch (error) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                state: 'closed'
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `Thanks for your interest, but we only accept PRs from organization members.`
+              });
