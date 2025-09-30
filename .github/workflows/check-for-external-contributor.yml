@@ -42,6 +42,10 @@ jobs:
                 throw new Error(`User ${prAuthor} is not an active member of the organization ${org}`);
               }
             } catch (error) {
+            
+              console.log(`error: ${error}`);
+              console.log(`error: ${error.status}`);
+              
               if (error.status === 404 || (error.message && error.message.includes('Not Found'))) {
                 await github.rest.pulls.update({
                   owner: context.repo.owner,
