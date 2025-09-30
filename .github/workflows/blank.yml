@@ -38,12 +38,10 @@ jobs:
                   state: 'closed'
                 });
 
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.payload.pull_request.number,
-                  body: commentBody
-                });
-              } else {
-                throw error;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `Thanks for your interest, but we only accept PRs from organization members.`
+              });
               }
