@@ -18,7 +18,7 @@ jobs:
       - name: Check if PR author is a member of the org
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN }}
           script: |
             const org = process.env['ORG_NAME'];
             const prAuthor = context.payload.pull_request.user.login;
