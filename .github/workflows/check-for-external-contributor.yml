@@ -10,6 +10,7 @@ env:
 permissions:
   pull-requests: write
   issues: write 
+  organization: read
 
 jobs:
   check-author:
