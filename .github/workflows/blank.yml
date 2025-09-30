@@ -16,8 +16,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const org =  process.env.ORG_NAME;
+            const org = process.env['ORG_NAME'];
             const prAuthor = context.payload.pull_request.user.login;
+            const commentBody = `Thanks for your interest, but we only accept PRs from organization members.`;
 
             try {
               const membership = await github.rest.orgs.getMembershipForUser({
@@ -26,15 +27,16 @@ jobs:
               });
 
               if (membership.data.state !== 'active') {
-                throw new Error('Not an active member');
+                throw new Error(`User ${prAuthor} is not an active member of the organization ${org}`);
               }
             } catch (error) {
-              await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                state: 'closed'
-              });
+              if (error.status === 404 || (error.message && error.message.includes('Not Found'))) {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  state: 'closed'
+                });
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
