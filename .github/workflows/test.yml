@@ -1,0 +1,58 @@
+name: Close External PRs
+
+on:
+  pull_request:
+    types: [opened]
+
+env:
+  ORG_NAME: mormond-demos
+
+permissions:
+  pull-requests: write
+  issues: write 
+
+jobs:
+  check-author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR author is a member of the org
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          script: |
+            const org = process.env['ORG_NAME'];
+            const prAuthor = context.payload.pull_request.user.login;
+            const commentBody = `Thanks for your interest, but we only accept PRs from organization members.`;
+
+            console.log(`Org: ${org}`);
+            console.log(`prAuthor: ${prAuthor}`);
+            console.log(`commentBody: ${commentBody}`);
+            
+            try {
+
+              });
+
+              console.log(`membership: ${membership}`);
+              console.log(`membership.data.state: ${membership.data.state}`);
+              
+            
+              if (membership.data.state !== 'active') {
+                throw new Error(`User ${prAuthor} is not an active member of the organization ${org}`);
+              }
+            } catch (error) {
+              if (error.status === 404 || (error.message && error.message.includes('Not Found'))) {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  state: 'closed'
+                });
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: `Thanks for your interest, but we only accept PRs from organization members.`
+                  });
+                }
+                // Optionally, rethrow or handle other errors here
+              }
