@@ -24,9 +24,9 @@ jobs:
             const prAuthor = context.payload.pull_request.user.login;
             const commentBody = `Thanks for your interest, but we only accept PRs from organization members.`;
 
-            console.log('Org: ${org}');
-            console.log('prAuthor: ${prAuthor}');
-            console.log('commentBody: ${commentBody}');
+            console.log(`Org: ${org}`);
+            console.log(`prAuthor: ${prAuthor}`);
+            console.log(`commentBody: ${commentBody}`);
             
             try {
               const membership = await github.rest.orgs.getMembershipForUser({
@@ -34,8 +34,8 @@ jobs:
                 username: prAuthor
               });
 
-              console.log('membership: ${membership}');
-              console.log('membership.data.state: ${membership.data.state}');
+              console.log(`membership: ${membership}`);
+              console.log(`membership.data.state: ${membership.data.state}`);
               
             
               if (membership.data.state !== 'active') {
